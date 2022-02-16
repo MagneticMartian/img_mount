@@ -1,0 +1,86 @@
+#!/bin/bash
+
+usage(){
+cat > /dev/stderr << EOF
+Usage:
+        img_mount <Disk_Image_File> <Mount_Point>
+EOF
+exit
+}
+
+lvm_mount(){
+    loop=/dev/loop0
+
+    dsk_img=$1
+    mnt_pnt=$2
+    sudo losetup $loop $dsk_img
+    sudo kpartx -a $loop
+
+    vg_name=$(echo $(sudo vgscan --mknodes) | awk '{print $4}' | tr -d \")
+    sudo vgchange -ay $vg_name
+
+    drive_names=$(sudo lvs | grep $vg_name | awk '{print $1}')
+    for i in $drive_names
+    do
+        [ $i == "swap" ] && continue
+        drive_name=$i
+        sudo mount "/dev/${vg_name}/$drive_name" $mnt_pnt/$drive_name
+    done
+}
+
+raw_msdos_mount(){
+    dsk_img=$1
+    mnt_pnt=$2
+
+    sec_size=$(fdisk -l $dsk_img | grep Units | awk '{print $(NF - 1)}')
+    sec_loc=$(fdisk -l -o Device,Start $dsk_img | grep ${dsk_img}1 | awk '{print $2}')
+
+    os=$(( $sec_size * $sec_loc ))
+
+    sudo mount -o loop,offset=$os $dsk_img $mnt_pnt
+
+}
+
+raw_linux_mount(){
+    loop_map=/dev/mapper
+    dsk_img=$1
+    mnt_pnt=$2
+
+    sudo losetup -f -P $dsk_img
+    sudo kpartx -a $dsk_img
+    dev=$(ls $loop_map)
+    for part in $dev
+    do
+        [ "$part" == "control" ] && continue
+        prt_mnt="mnt/$part"
+        [ ! -d $prt_mnt ] && mkdir -p $prt_mnt
+        sudo mount ${loop_map}/$part $prt_mnt
+    done
+}
+
+[ $# -ne 2 ] && usage
+
+dsk_img=$1
+[ ! -f $dsk_img ] && echo "Bad image file name: $dsk_img" && exit
+mnt_pnt=$2
+[ ! -d $mnt_pnt ] && echo "Not a mount point: $mnt_pnt" && exi
+
+lvm_part=$(sudo fdisk -l $dsk_img | grep LVM)
+
+if [ -z "$lvm_part" ]
+then
+    read -p "Is image freedos/templeOS or similar [y/n]" ans
+    case $ans in
+        y)
+          raw_msdos_mount $dsk_img $mnt_pnt
+          ;;
+        n)
+          raw_linux_mount $dsk_img $mnt_pnt
+          ;;
+        *)
+          echo "Bad Response"
+          exit
+    esac
+else
+    lvm_mount $dsk_img $mnt_pnt
+fi
