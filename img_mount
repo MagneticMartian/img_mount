@@ -63,7 +63,7 @@ raw_linux_mount(){
 dsk_img=$1
 [ ! -f $dsk_img ] && echo "Bad image file name: $dsk_img" && exit
 mnt_pnt=$2
-[ ! -d $mnt_pnt ] && echo "Not a mount point: $mnt_pnt" && exi
+[ ! -d $mnt_pnt ] && echo "Not a mount point: $mnt_pnt" && exit
 
 lvm_part=$(sudo fdisk -l $dsk_img | grep LVM)
 
