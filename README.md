@@ -3,4 +3,4 @@ This is a script that is used for mounting Images for inspection and editing pur
 
 TODO:
 
-Add functionality to mount multiple partitions in both LVM and raw mounts. -- Probably best to break the raw_mount function into different functions for Images based on or imspired by MSDOS and GNU/Linux based Images.
+Handle btrfs filesystems
