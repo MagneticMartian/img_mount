@@ -24,7 +24,7 @@ lvm_mount(){
     do
         [ $i == "swap" ] && continue
         drive_name=$i
-        sudo mount "/dev/${vg_name}/$drive_name" $mnt_pnt
+        sudo mount "/dev/${vg_name}/$drive_name" $mnt_pnt/$drive_name
     done
 }
 
