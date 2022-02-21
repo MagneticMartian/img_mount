@@ -3,3 +3,5 @@ This is a script that is used for mounting Images for inspection and editing pur
 
 ## TODO:
 Handle btrfs filesystems
+
+Add a cleanup function
