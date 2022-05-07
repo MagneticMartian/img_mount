@@ -9,6 +9,12 @@ This creates the image file based on the values in config
 
 # run
 This runs the image in a qemu vm. It both runs the original iso file and the image after it has been fully built.
+## multi-threading
+To enable multi-threading add the argument options:
+```
+-smp cores=2,threads=1,sockets=1
+```
+The values of each argument should be changed to fit the needs of the system being ran.
 
 ## TODO:
 Handle btrfs filesystems
