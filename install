@@ -1,0 +1,5 @@
+#!/bin/bash
+
+. ./config
+
+$QEMU_IMG $format $dsk_img $dsk_size

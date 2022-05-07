@@ -1,0 +1,37 @@
+#!/bin/bash
+
+usage(){
+cat > /dev/stderr << EOF
+Usage:
+        run <Disk_Image_file>
+Description:
+        Wrapper around qemu-system-x86_64. Sets the flags and option automatically
+        after prompting.
+EOF
+exit
+}
+
+. ./config
+
+[ $# -ne 1 ] && usage
+
+dsk_img=$1
+
+[ ! -f $dsk_img ] && echo "Bad image file name: $dsk_img" && exit
+
+read -p "Is this the initial install with ISO? [y/n] " ans
+
+case $ans in
+    y|Y|yes|Yes|YES)
+        read -p "Supply path to iso: " ISO
+        [ ! -f $ISO ] && echo "Bad iso file name: $ISO" && exit
+        args="-enable-kvm -cpu host -boot d -cdrom $ISO -drive file=${dsk_img} -m 2G -display gtk,zoom-to-fit=on"
+        ;;
+    n|N|no|No|NO)
+        args="-enable-kvm -cpu host -boot d -drive file=${dsk_img} -m 2G -display gtk,zoom-to-fit=on"
+        ;;
+    *)
+        echo "Invalid entery"
+esac
+
+$QEMU_X86_64 $args

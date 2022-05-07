@@ -1,0 +1,9 @@
+#!/bin/bash
+
+format='raw'
+dsk_size='8G'
+[ -f './Image.img' ] && dsk_img= || dsk_img='Image.img'
+
+QEMU_IMG="qemu-img create -f"
+
+QEMU_X86_64="sudo qemu-system-x86_64"
