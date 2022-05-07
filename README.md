@@ -16,7 +16,7 @@ To enable multi-threading add the argument options:
 ```
 The values of each argument should be changed to fit the needs of the system being ran.
 
-## TODO:
+# TODO:
 Handle btrfs filesystems
 
 Add a cleanup function
